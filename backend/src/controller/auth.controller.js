@@ -1,5 +1,6 @@
 import userModel from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
+import { sendEmail } from '../services/mail.service.js';
 
 const registerController = async (req, res) => {
     try {
@@ -17,7 +18,15 @@ const registerController = async (req, res) => {
 
         const user = await userModel.create({ username, email, password });
 
-        res.status(201).json({
+        await sendEmail({
+            to: email,
+            subject: "Welcome to perplixity - MinAI",
+            html: `<p> Hi ${username},</p>
+            <p>Thank you for registering at <strong>Perplexity</strong>. We're excited to have you onboard.</p>
+            <p>Best Regards,<br /> The Perplexity Team</p>`
+        })
+
+        return res.status(201).json({
             message: "User registered successfully",
             success: true,
             user: {
